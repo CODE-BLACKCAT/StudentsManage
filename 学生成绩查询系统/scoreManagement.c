@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <conio.h>
 
-//成绩结构体
+// 成绩结构体
 typedef struct student
 {
 	int num; // 学号
@@ -13,13 +13,15 @@ typedef struct student
 	int math;
 	int english;
 	char profession[30]; // 专业
-}Student;
+	int rank; // 排名
+}Student; 
 
 typedef struct Index // 定义索引文件结构
 {
 	int num;// 学号
 	char name[11]; // 姓名
 	char profession[30]; // 专业
+	int rank; // 排名
 	long offset;// 主文件中的记录号
 }Index;
 
@@ -30,7 +32,10 @@ static int professionArray[100];
 //函数声明 
 void showMenu(void);// 菜单 
 void creatIdxFile(void);// 建立索引文件
-void insertSort(struct Index index[], int n);
+void SortByNum(struct Index index[], int n);// 按照学号排名
+void sortByName(struct Index index[], int n);// 按照姓名排名
+void sortByProfession(struct Index index[], int n);// 按照专业排名
+void sortByRank(struct Index index[], int n);// 按照专业排名
 void addStudent(int);// 录入成绩 
 void readIndexFile(Index idx[100], int* n);    //读索引文件数据存入idx数组中
 int searchNum(Index idx[], int n, int no); //在含有n个记录的索引文件idx中查找学号为no的记录对应的记录号
@@ -46,10 +51,11 @@ void reviseScore(void);// 修改成绩
 void showScore(void);// 成绩显示 
 void deleteScore(void);// 删除成绩 
 void saveScore(void);// 保存成绩并退出 
-// void showScoreByRank(void); // 按排名显示成绩
+void showScoreByRank(void); // 按排名显示成绩
 void showScoreByName(void);// 按姓名显示成绩
 void showScoreByNum(void);// 按学号显示成绩
-// void showScoreByProfession(void);// 按专业显示成绩
+void showScoreByProfession(void);// 按专业显示成绩
+void calcuteRank(); // 计算排名 
 //main函数 
 int main()
 {
@@ -67,12 +73,13 @@ int main()
 		case 1: printf("请输入您要录入的人数：");
 			scanf_s("%d", &n);
 			addStudent(n);
+			calcuteRank();
 			creatIdxFile();
 			break;
-		case 2: deleteScore(); creatIdxFile();  break;
-		case 3: reviseScore(); creatIdxFile();  break;
+		case 2: deleteScore(); calcuteRank();  creatIdxFile();  break;
+		case 3: reviseScore(); calcuteRank();  creatIdxFile();  break;
 		case 4: inquiry(); break;
-		case 5: showScoreByNum(); break;
+		case 5: showScore(); break;
 		case 0: saveScore(); break;
 		default: printf("输入错误，请重试！\n"); int m = _getch();
 		}
@@ -99,7 +106,7 @@ void showMenu()
 	return;
 }
 
-void insertSort(Index index[], int n)
+void SortByNum(Index index[], int n)
 {
 	int i, j;
 	Index temp;
@@ -138,10 +145,10 @@ void creatIdxFile()
 		idx[i].num = st.num;
 		strcpy_s(idx[i].profession, 30, st.profession);
 		strcpy_s(idx[i].name, 11, st.name);
+		idx[i].rank = st.rank;
 		idx[i].offset = ++n;
 		i++;
 	}
-	// insertSort(idx, n);  //对idx数组按no值排序
 	rewind(idxfile);
 	for (i = 0; i < n; i++)
 		fwrite(&idx[i], sizeof(Index), 1, idxfile);
@@ -183,9 +190,9 @@ void addStudent(int n)
 
 		printf("专业：");
 		scanf_s("%s", &stu[i].profession, 30);
-		//写入数据 
+		stu[i].rank = -1;
+		// 写入数据
 		fwrite(&stu[i], sizeof(Student), 1, mfile);
-		
 	}
 	fclose(mfile);
 	printf("添加学生成功,请按任意键返回\n");
@@ -238,13 +245,13 @@ void getByNum()
 		return;
 	}
 	readIndexFile(idx, &n);       //读取索引数组idx
-	if (n == NULL) {
+	if (n == 0) {
 		printf("未知错误\n");
 		exit(0);
 	}
 	printf("输入学号:");
 	scanf_s("%d", &num);
-	insertSort(idx, n);
+	SortByNum(idx, n);
 	i = searchNum(idx, n, num);      //在idx中查找
 	if (i == -1)
 		printf("  提示:学号%d不存在\n", num);
@@ -252,8 +259,8 @@ void getByNum()
 	{
 		fseek(mfile, (i - 1) * sizeof(Student), SEEK_SET); //由记录号直接跳到主文件中对应的记录
 		fread(&st, sizeof(Student), 1, mfile);
-		printf("学号\t姓名\t语文\t数学\t英语\t专业\n");
-		printf("%d\t%s\t%d\t%d\t%d\t%s\t\n", st.num, st.name, st.chinese, st.math, st.english, st.profession);
+		printf("学号\t姓名\t语文\t数学\t英语\t专业\t排名\n");
+		printf("%d\t%s\t%d\t%d\t%d\t%s\t%d\n", st.num, st.name, st.chinese, st.math, st.english, st.profession, st.rank);
 		printf("按任意键返回\n");
 		int m = _getch();
 	}
@@ -284,7 +291,7 @@ void getByName()
 		return;
 	}
 	readIndexFile(idx, &n);       //读取索引数组idx
-	if (n == NULL) {
+	if (n == 0) {
 		printf("  未知错误\n");
 		exit(-1);
 	}
@@ -295,12 +302,12 @@ void getByName()
 		printf("  提示:姓名%s不存在\n", name);
 	else
 	{
-		printf("学号\t姓名\t语文\t数学\t英语\t专业\n");
+		printf("学号\t姓名\t语文\t数学\t英语\t专业\t排名\n");
 		while (nameArray[ino] != -1)
 		{
 			fseek(mfile, (nameArray[ino]) * sizeof(Student), SEEK_SET); //由记录号直接跳到主文件中对应的记录
 			fread(&st, sizeof(Student), 1, mfile);
-			printf("%d\t%s\t%d\t%d\t%d\t%s\t\n", st.num, st.name, st.chinese, st.math, st.english, st.profession);
+			printf("%d\t%s\t%d\t%d\t%d\t%s\t%d\n", st.num, st.name, st.chinese, st.math, st.english, st.profession, st.rank);
 			ino++;
 		}
 		memset(nameArray, -1, 400); // 将数组的值全部设置为 -1
@@ -334,7 +341,7 @@ void getByProfession()
 		return;
 	}
 	readIndexFile(idx, &n);       //读取索引数组idx
-	if (n == NULL) {
+	if (n == 0) {
 		printf("  未知错误\n");
 		exit(-1);
 	}
@@ -348,12 +355,12 @@ void getByProfession()
 	}
 	else
 	{
-		printf("学号\t姓名\t语文\t数学\t英语\t专业\n");
+		printf("学号\t姓名\t语文\t数学\t英语\t专业\t排名\n");
 		while (professionArray[ino] != -1)
 		{
 			fseek(mfile, (professionArray[ino]) * sizeof(Student), SEEK_SET); //由记录号直接跳到主文件中对应的记录
 			fread(&st, sizeof(Student), 1, mfile);
-			printf("%d\t%s\t%d\t%d\t%d\t%s\t\n", st.num, st.name, st.chinese, st.math, st.english, st.profession);
+			printf("%d\t%s\t%d\t%d\t%d\t%s\t%d\n", st.num, st.name, st.chinese, st.math, st.english, st.profession, st.rank);
 			ino++;
 		}
 		memset(professionArray, -1, 400); // 将数组的值全部设置为 -1
@@ -408,7 +415,7 @@ void reviseScore()
 		return;
 	}
 	readIndexFile(idx, &n);       //读取索引数组idx
-	if (n == NULL) {
+	if (n == 0) {
 		printf("未知错误\n");
 		exit(0);
 	}
@@ -436,8 +443,8 @@ void reviseScore()
 		
 		fseek(mfile, (i - 1) * sizeof(Student), SEEK_SET); //由记录号直接跳到主文件中对应的记录
 		fwrite(&stu, sizeof(Student), 1, mfile);
-		printf("学号\t姓名\t语文\t数学\t英语\t专业\n");
-		printf("%d\t%s\t%d\t%d\t%d\t%s\t\n", stu.num, stu.name, stu.chinese, stu.math, stu.english, stu.profession);
+		printf("学号\t姓名\t语文\t数学\t英语\t专业\t排名\n");
+		printf("%d\t%s\t%d\t%d\t%d\t%s\t%d\n", stu.num, stu.name, stu.chinese, stu.math, stu.english, stu.profession, stu.rank);
 		printf("按任意键返回\n");
 		int m = _getch();
 	}
@@ -446,31 +453,22 @@ void reviseScore()
 // 显示成绩
 void showScore() 
 {
-	FILE* mfile;
-	Student stu;
-	Index idx[100];
-	int i, num;
-	int n;
-	if ((mfile = fopen("cj.txt", "r+")) == NULL)
+	int k;
+	do
 	{
-		printf("  提示:主文件中没有任何记录\n");
-		return;
-	}
-	readIndexFile(idx, &n);       //读取索引数组idx
-	if (n == 0) {
-		printf("无数据\n");
-		return;
-	}
-
-	printf("学号\t姓名\t语文\t数学\t英语\t专业\n");
-	for (int i = 1; i <= n; ++i) {
-		fseek(mfile, (i - 1) * sizeof(Student), SEEK_SET); //由记录号直接跳到主文件中对应的记录
-		fread(&stu, sizeof(Student), 1, mfile);
-		printf("%d\t%s\t%d\t%d\t%d\t%s\t\n", stu.num, stu.name, stu.chinese, stu.math, stu.english, stu.profession);
-	}
-	printf("按任意键返回\n");
-	int m = _getch();
-	fclose(mfile);
+		showScoreScendMenu();
+		scanf_s("%d", &k);
+		switch (k)
+		{
+		case 1:showScoreByRank(); break;//成绩 
+		case 2:showScoreByName(); break;//姓名
+		case 3:showScoreByProfession(); break;//专业
+		case 4:showScoreByNum(); break;//学号
+		case 0:break;
+		default:printf("输入错误，请重新选择\n"); int m = _getch();
+		}
+	} while (k != 0);
+	return;
 }
 // 删除信息
 void deleteScore()
@@ -486,7 +484,7 @@ void deleteScore()
 		return;
 	}
 	readIndexFile(idx, &n);       //读取索引数组idx
-	if (n == NULL) {
+	if (n == 0) {
 		printf("未知错误\n");
 		exit(0);
 	}
@@ -535,18 +533,17 @@ void showScoreScendMenu(void)
 	printf("*               1： 按成绩降序显示                   *\n");
 	printf("*               2： 按姓名降序显示                   *\n");
 	printf("*               3： 按专业降序显示                   *\n");
-	printf("*               4： 按学号降序显示                   *\n");
+	printf("*               4： 按学号升序显示                   *\n");
 	printf("*               0： 退出查询系统，返回主系统         *\n");
 	printf("*----------------------------------------------------*\n");
 	printf("选择操作<0-3>                                         \n");
 }
-// 需要修改
+
 void showScoreByName(void)
 {
 	FILE* mfile;
 	Student stu;
 	Index idx[100];
-	int i, num;
 	int n;
 	if ((mfile = fopen("cj.txt", "r+")) == NULL)
 	{
@@ -558,13 +555,12 @@ void showScoreByName(void)
 		printf("无数据\n");
 		return;
 	}
-	
-	printf("学号\t姓名\t语文\t数学\t英语\t专业\n");
+	sortByName(idx, n);
+	printf("学号\t姓名\t语文\t数学\t英语\t专业\t排名\n");
 	for (int i = 0; i < n; ++i) {
-		fseek(mfile, (idx[i].offset) * sizeof(Student), SEEK_SET); //由记录号直接跳到主文件中对应的记录
+		fseek(mfile, (idx[i].offset - 1) * sizeof(Student), SEEK_SET); //由记录号直接跳到主文件中对应的记录
 		fread(&stu, sizeof(Student), 1, mfile);
-		printf("%d\t%s\t%d\t%d\t%d\t%s\t", stu.num, stu.name, stu.chinese, stu.math, stu.english, stu.profession);
-		printf("\n");
+		printf("%d\t%s\t%d\t%d\t%d\t%s\t%d\n", stu.num, stu.name, stu.chinese, stu.math, stu.english, stu.profession, stu.rank);
 	}
 	printf("按任意键返回\n");
 	int m = _getch();
@@ -576,7 +572,6 @@ void showScoreByNum(void)
 	FILE* mfile;
 	Student stu;
 	Index idx[100];
-	int i, num;
 	int n;
 	if ((mfile = fopen("cj.txt", "r+")) == NULL)
 	{
@@ -588,14 +583,168 @@ void showScoreByNum(void)
 		printf("无数据\n");
 		return;
 	}
-	insertSort(idx, n);
-	printf("学号\t姓名\t语文\t数学\t英语\t专业\n");
+	SortByNum(idx, n);
+	printf("学号\t姓名\t语文\t数学\t英语\t专业\t排名\n");
 	for (int i = 0; i < n; ++i) {
 		fseek(mfile, (idx[i].offset - 1) * sizeof(Student), SEEK_SET); //由记录号直接跳到主文件中对应的记录
 		fread(&stu, sizeof(Student), 1, mfile);
-		printf("%d\t%s\t%d\t%d\t%d\t%s\t\n", stu.num, stu.name, stu.chinese, stu.math, stu.english, stu.profession);
+		printf("%d\t%s\t%d\t%d\t%d\t%s\t%d\n", stu.num, stu.name, stu.chinese, stu.math, stu.english, stu.profession, stu.rank);
 	}
 	printf("按任意键返回\n");
 	int m = _getch();
+	fclose(mfile);
+}
+
+void sortByName(Index index[], int n)
+{
+	int i, j;
+	Index temp;
+	for (i = 1; i < n; i++)
+	{
+		temp = index[i];
+		j = i - 1;
+		while (j >= 0 && strcmp(temp.name, index[j].name) < 0)
+		{
+			index[j + 1] = index[j];  
+			j--;
+		}
+		index[j + 1] = temp;     
+	}
+}
+
+void sortByProfession(Index index[], int n)
+{
+	int i, j;
+	Index temp;
+	for (i = 1; i < n; i++)
+	{
+		temp = index[i];
+		j = i - 1;
+		while (j >= 0 && strcmp(temp.profession, index[j].profession) < 0)
+		{
+			index[j + 1] = index[j];
+			j--;
+		}
+		index[j + 1] = temp;
+	}
+}
+
+void sortByRank(Index index[], int n)
+{
+	int i, j;
+	Index temp;
+	for (i = 1; i < n; i++)
+	{
+		temp = index[i];
+		j = i - 1;
+		while (j >= 0 && temp.rank < index[j].rank)
+		{
+			index[j + 1] = index[j];
+			j--;
+		}
+		index[j + 1] = temp;
+	}
+}
+
+void showScoreByRank(void)
+{
+	FILE* mfile;
+	Student stu;
+	Index idx[100];
+	int n;
+	if ((mfile = fopen("cj.txt", "r+")) == NULL)
+	{
+		printf("  提示:主文件中没有任何记录\n");
+		return;
+	}
+	readIndexFile(idx, &n);       //读取索引数组idx
+	if (n == 0) {
+		printf("无数据\n");
+		return;
+	}
+	sortByRank(idx, n);
+	printf("学号\t姓名\t语文\t数学\t英语\t专业\t排名\n");
+	for (int i = 0; i < n; ++i) {
+		fseek(mfile, (idx[i].offset - 1) * sizeof(Student), SEEK_SET); //由记录号直接跳到主文件中对应的记录
+		fread(&stu, sizeof(Student), 1, mfile);
+		printf("%d\t%s\t%d\t%d\t%d\t%s\t%d\n", stu.num, stu.name, stu.chinese, stu.math, stu.english, stu.profession, stu.rank);
+	}
+	printf("按任意键返回\n");
+	int m = _getch();
+	fclose(mfile);
+}
+
+void showScoreByProfession(void)
+{
+	FILE* mfile;
+	Student stu;
+	Index idx[100];
+	int n;
+	if ((mfile = fopen("cj.txt", "r+")) == NULL)
+	{
+		printf("  提示:主文件中没有任何记录\n");
+		return;
+	}
+	readIndexFile(idx, &n);       //读取索引数组idx
+	if (n == 0) {
+		printf("无数据\n");
+		return;
+	}
+	sortByProfession(idx, n);
+	printf("学号\t姓名\t语文\t数学\t英语\t专业\t排名\n");
+	for (int i = 0; i < n; ++i) {
+		fseek(mfile, (idx[i].offset - 1) * sizeof(Student), SEEK_SET); //由记录号直接跳到主文件中对应的记录
+		fread(&stu, sizeof(Student), 1, mfile);
+		printf("%d\t%s\t%d\t%d\t%d\t%s\t%d\n", stu.num, stu.name, stu.chinese, stu.math, stu.english, stu.profession, stu.rank);
+	}
+	printf("按任意键返回\n");
+	int m = _getch();
+	fclose(mfile);
+}
+
+void calcuteRank()
+{
+	typedef struct RankNode
+	{
+		int score;
+		int* address;
+	}RankNode;
+	RankNode rn[100];
+	// 求出一共有多少条记录
+	int lengh, n;
+	Student st[100] = {0};
+	FILE* mfile;
+	if ((mfile = fopen("cj.txt", "r+")) == NULL)
+	{
+		printf("  提示:索引文件不能打开\n");
+		return;
+	}
+	fseek(mfile, 0, SEEK_END);
+	lengh = ftell(mfile);       //求出文件长度
+	rewind(mfile);
+	n = lengh / sizeof(Student);      //n
+	rewind(mfile);
+	fwrite(st, sizeof(Student), n, mfile);
+	// 关联
+	for (int i = 0; i < n; ++i) {
+		rn[i].score = st[i].chinese + st[i].english + st[i].math;
+		rn[i].address = &st[i].rank;
+	}
+	// 冒泡排序
+	RankNode tmp;
+	for (int i = 0; i < n; ++i) {
+		for (int j = 0; j < n - i - 1; ++j) {
+			if (rn[j].score < rn[j + 1].score) {
+				tmp = rn[j];
+				rn[j] = rn[j + 1];
+				rn[j + 1] = tmp;
+			}
+		}
+	}
+	for (int i = 0; i < n; ++i) {
+		*(rn[i].address) = i + 1;
+	}
+	rewind(mfile);
+	fwrite(st, sizeof(Student), n , mfile);
 	fclose(mfile);
 }
