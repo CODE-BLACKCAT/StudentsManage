@@ -77,7 +77,7 @@ int main()
 			creatIdxFile();
 			break;
 		case 2: deleteScore(); calcuteRank();  creatIdxFile();  break;
-		case 3: reviseScore(); calcuteRank();  creatIdxFile();  break;
+		case 3: reviseScore(); creatIdxFile();  break;
 		case 4: inquiry(); break;
 		case 5: showScore(); break;
 		case 0: saveScore(); break;
@@ -443,6 +443,7 @@ void reviseScore()
 		
 		fseek(mfile, (i - 1) * sizeof(Student), SEEK_SET); //由记录号直接跳到主文件中对应的记录
 		fwrite(&stu, sizeof(Student), 1, mfile);
+		calcuteRank();
 		printf("学号\t姓名\t语文\t数学\t英语\t专业\t排名\n");
 		printf("%d\t%s\t%d\t%d\t%d\t%s\t%d\n", stu.num, stu.name, stu.chinese, stu.math, stu.english, stu.profession, stu.rank);
 		printf("按任意键返回\n");
@@ -509,6 +510,7 @@ void deleteScore()
 			stu[k - 1].math = stu[k].math;
 			stu[k - 1].english = stu[k].english;
 			strcpy_s(stu[k - 1].profession, 30, stu[k].profession);
+			stu[k - 1].rank = stu[k].rank;
 		}
 		rewind(mfile);
 		fwrite(stu, sizeof(Student), n - 1, mfile);
@@ -724,7 +726,13 @@ void calcuteRank()
 	rewind(mfile);
 	n = lengh / sizeof(Student);      //n
 	rewind(mfile);
-	fwrite(st, sizeof(Student), n, mfile);
+	if (n < 100) {
+		fread(st, sizeof(Student), n, mfile);
+	}
+	else {
+		printf("未知错误\n！");
+		exit(-1);
+	}
 	// 关联
 	for (int i = 0; i < n; ++i) {
 		rn[i].score = st[i].chinese + st[i].english + st[i].math;
@@ -745,6 +753,12 @@ void calcuteRank()
 		*(rn[i].address) = i + 1;
 	}
 	rewind(mfile);
-	fwrite(st, sizeof(Student), n , mfile);
+	if (n < 100) {
+		fwrite(st, sizeof(Student), n, mfile);
+	}
+	else {
+		printf("未知错误\n！");
+		exit(-1);
+	}
 	fclose(mfile);
 }
