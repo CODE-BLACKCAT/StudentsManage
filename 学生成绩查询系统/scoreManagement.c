@@ -45,7 +45,7 @@ void readIndexFile(Index idx[MaxSize], int* n);    //读索引文件数据存入idx数组中
 void SortByNum(struct Index index[], int n);// 按照学号排名
 void sortByName(struct Index index[], int n);// 按照姓名排名
 void sortByProfession(struct Index index[], int n);// 按照专业排名
-void sortByProfessionWithStudent(Student st[], int n);//按照专业排名
+void sortByProfessionWithStudent(Student st[MaxSize], int n);//按照专业排名
 void sortByRank(struct Index index[], int n);// 按照专业排名
 // 关于查找记录号的函数
 int searchNum(Index idx[], int n, int no); //在含有n个记录的索引文件idx中查找学号为no的记录对应的记录号
@@ -91,7 +91,7 @@ int main()
 			creatIdxFile();
 			break;
 		case 2: deleteScore(); calcuteRank();  creatIdxFile();  break;
-		case 3: reviseScore(); creatIdxFile();  break;
+		case 3: reviseScore(); calcuteRank();  creatIdxFile();  break;
 		case 4: inquiry(); break;
 		case 5: showScore(); break;
 		case 6: analyseScore(); break;
@@ -273,10 +273,10 @@ void getByNum()
 		printf("  提示:学号%d不存在\n", num);
 	else
 	{
-		fseek(mfile, (i - 1) * sizeof(Student), SEEK_SET); //由记录号直接跳到主文件中对应的记录
+		fseek(mfile, (idx[i].offset - 1) * sizeof(Student), SEEK_SET); //由记录号直接跳到主文件中对应的记录
 		fread(&st, sizeof(Student), 1, mfile);
-		printf("学号\t姓名\t语文\t数学\t英语\t专业\t排名\n");
-		printf("%d\t%s\t%d\t%d\t%d\t%s\t%d\n", st.num, st.name, st.chinese, st.math, st.english, st.profession, st.rank);
+		printf("学号\t姓名\t语文\t数学\t英语\t专业\t\t排名\n");
+		printf("%-d\t%-s\t%-d\t%-d\t%-d\t%-12s\t%-d\n", st.num, st.name, st.chinese, st.math, st.english, st.profession, st.rank);
 		printf("按任意键返回\n");
 		int m = _getch();
 	}
@@ -318,12 +318,12 @@ void getByName()
 		printf("  提示:姓名%s不存在\n", name);
 	else
 	{
-		printf("学号\t姓名\t语文\t数学\t英语\t专业\t排名\n");
+		printf("学号\t姓名\t语文\t数学\t英语\t专业\t\t排名\n");
 		while (nameArray[ino] != -1)
 		{
 			fseek(mfile, (nameArray[ino]) * sizeof(Student), SEEK_SET); //由记录号直接跳到主文件中对应的记录
 			fread(&st, sizeof(Student), 1, mfile);
-			printf("%d\t%s\t%d\t%d\t%d\t%s\t%d\n", st.num, st.name, st.chinese, st.math, st.english, st.profession, st.rank);
+			printf("%-d\t%-s\t%-d\t%-d\t%-d\t%-12s\t%-d\n", st.num, st.name, st.chinese, st.math, st.english, st.profession, st.rank);
 			ino++;
 		}
 		memset(nameArray, -1, 400); // 将数组的值全部设置为 -1
@@ -371,12 +371,12 @@ void getByProfession()
 	}
 	else
 	{
-		printf("学号\t姓名\t语文\t数学\t英语\t专业\t排名\n");
+		printf("学号\t姓名\t语文\t数学\t英语\t专业\t\t排名\n");
 		while (professionArray[ino] != -1)
 		{
 			fseek(mfile, (professionArray[ino]) * sizeof(Student), SEEK_SET); //由记录号直接跳到主文件中对应的记录
 			fread(&st, sizeof(Student), 1, mfile);
-			printf("%d\t%s\t%d\t%d\t%d\t%s\t%d\n", st.num, st.name, st.chinese, st.math, st.english, st.profession, st.rank);
+			printf("%-d\t%-s\t%-d\t%-d\t%-d\t%-12s\t%-d\n", st.num, st.name, st.chinese, st.math, st.english, st.profession, st.rank);
 			ino++;
 		}
 		memset(professionArray, -1, 400); // 将数组的值全部设置为 -1
@@ -443,8 +443,8 @@ void reviseScore()
 	else
 	{
 		Student stu;
-		stu.num = idx[i-1].num;
-		strcpy_s(stu.name, NameSize, idx[i-1].name);
+		stu.num = idx[i - 1].num;
+		strcpy_s(stu.name, NameSize, idx[i - 1].name);
 
 		printf("新语文成绩：");
 		scanf_s("%d", &stu.chinese);
@@ -457,11 +457,10 @@ void reviseScore()
 
 		strcpy_s(stu.profession, ProfessionSize, idx[i-1].profession);
 		
-		fseek(mfile, (i - 1) * sizeof(Student), SEEK_SET); //由记录号直接跳到主文件中对应的记录
+		fseek(mfile, (idx[i-1].offset - 1) * sizeof(Student), SEEK_SET); //由记录号直接跳到主文件中对应的记录
 		fwrite(&stu, sizeof(Student), 1, mfile);
-		calcuteRank();
-		printf("学号\t姓名\t语文\t数学\t英语\t专业\t排名\n");
-		printf("%d\t%s\t%d\t%d\t%d\t%s\t%d\n", stu.num, stu.name, stu.chinese, stu.math, stu.english, stu.profession, stu.rank);
+		printf("学号\t姓名\t语文\t数学\t英语\t专业\n");
+		printf("%d\t%s\t%d\t%d\t%d\t%s\n", stu.num, stu.name, stu.chinese, stu.math, stu.english, stu.profession);
 		printf("按任意键返回\n");
 		int m = _getch();
 	}
@@ -574,11 +573,11 @@ void showScoreByName(void)
 		return;
 	}
 	sortByName(idx, n);
-	printf("学号\t姓名\t语文\t数学\t英语\t专业\t排名\n");
+	printf("学号\t姓名\t语文\t数学\t英语\t专业\t\t排名\n");
 	for (int i = 0; i < n; ++i) {
 		fseek(mfile, (idx[i].offset - 1) * sizeof(Student), SEEK_SET); //由记录号直接跳到主文件中对应的记录
 		fread(&stu, sizeof(Student), 1, mfile);
-		printf("%d\t%s\t%d\t%d\t%d\t%s\t%d\n", stu.num, stu.name, stu.chinese, stu.math, stu.english, stu.profession, stu.rank);
+		printf("%-d\t%-s\t%-d\t%-d\t%-d\t%-12s\t%-d\n", stu.num, stu.name, stu.chinese, stu.math, stu.english, stu.profession, stu.rank);
 	}
 	printf("按任意键返回\n");
 	int m = _getch();
@@ -602,11 +601,11 @@ void showScoreByNum(void)
 		return;
 	}
 	SortByNum(idx, n);
-	printf("学号\t姓名\t语文\t数学\t英语\t专业\t排名\n");
+	printf("学号\t姓名\t语文\t数学\t英语\t专业\t\t排名\n");
 	for (int i = 0; i < n; ++i) {
 		fseek(mfile, (idx[i].offset - 1) * sizeof(Student), SEEK_SET); //由记录号直接跳到主文件中对应的记录
 		fread(&stu, sizeof(Student), 1, mfile);
-		printf("%d\t%s\t%d\t%d\t%d\t%s\t%d\n", stu.num, stu.name, stu.chinese, stu.math, stu.english, stu.profession, stu.rank);
+		printf("%-d\t%-s\t%-d\t%-d\t%-d\t%-12s\t%-d\n", stu.num, stu.name, stu.chinese, stu.math, stu.english, stu.profession, stu.rank);
 	}
 	printf("按任意键返回\n");
 	int m = _getch();
@@ -681,11 +680,11 @@ void showScoreByRank(void)
 		return;
 	}
 	sortByRank(idx, n);
-	printf("学号\t姓名\t语文\t数学\t英语\t专业\t排名\n");
+	printf("学号\t姓名\t语文\t数学\t英语\t专业\t\t排名\n");
 	for (int i = 0; i < n; ++i) {
 		fseek(mfile, (idx[i].offset - 1) * sizeof(Student), SEEK_SET); //由记录号直接跳到主文件中对应的记录
 		fread(&stu, sizeof(Student), 1, mfile);
-		printf("%d\t%s\t%d\t%d\t%d\t%s\t%d\n", stu.num, stu.name, stu.chinese, stu.math, stu.english, stu.profession, stu.rank);
+		printf("%-d\t%-s\t%-d\t%-d\t%-d\t%-12s\t%-d\n", stu.num, stu.name, stu.chinese, stu.math, stu.english, stu.profession, stu.rank);
 	}
 	printf("按任意键返回\n");
 	int m = _getch();
@@ -709,11 +708,11 @@ void showScoreByProfession(void)
 		return;
 	}
 	sortByProfession(idx, n);
-	printf("学号\t姓名\t语文\t数学\t英语\t专业\t排名\n");
+	printf("学号\t姓名\t语文\t数学\t英语\t专业\t\t排名\n");
 	for (int i = 0; i < n; ++i) {
 		fseek(mfile, (idx[i].offset - 1) * sizeof(Student), SEEK_SET); //由记录号直接跳到主文件中对应的记录
 		fread(&stu, sizeof(Student), 1, mfile);
-		printf("%d\t%s\t%d\t%d\t%d\t%s\t%d\n", stu.num, stu.name, stu.chinese, stu.math, stu.english, stu.profession, stu.rank);
+		printf("%-d\t%-s\t%-d\t%-d\t%-d\t%-12s\t%-d\n", stu.num, stu.name, stu.chinese, stu.math, stu.english, stu.profession, stu.rank);
 	}
 	printf("按任意键返回\n");
 	int m = _getch();
