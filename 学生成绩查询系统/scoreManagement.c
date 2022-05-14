@@ -15,8 +15,8 @@ typedef struct student
 	char profession[30]; // 专业
 	int rank; // 排名
 }Student; 
-
-typedef struct Index // 定义索引文件结构
+// 索引文件结构体
+typedef struct Index
 {
 	int num;// 学号
 	char name[11]; // 姓名
@@ -30,32 +30,40 @@ static int nameArray[100];
 static int professionArray[100];
 
 //函数声明 
+// 关于菜单的函数
 void showMenu(void);// 菜单 
+void showScendMenu(void);// 二级菜单，查询菜单 
+void showScoreScendMenu(void); // 二级菜单，显示成绩菜单 
+// 关于索引文件的函数
 void creatIdxFile(void);// 建立索引文件
+void readIndexFile(Index idx[100], int* n);    //读索引文件数据存入idx数组中
+// 关于排名方式的函数
 void SortByNum(struct Index index[], int n);// 按照学号排名
 void sortByName(struct Index index[], int n);// 按照姓名排名
 void sortByProfession(struct Index index[], int n);// 按照专业排名
 void sortByRank(struct Index index[], int n);// 按照专业排名
-void addStudent(int);// 录入成绩 
-void readIndexFile(Index idx[100], int* n);    //读索引文件数据存入idx数组中
+// 关于查找记录号的函数
 int searchNum(Index idx[], int n, int no); //在含有n个记录的索引文件idx中查找学号为no的记录对应的记录号
-void getByNum(void);// 学号查询 
 void searchName(Index idx[], int n, char name[]);// 在含有n个记录的索引文件idx中查找姓名为name的记录对应的记录号
-void getByName(void);// 姓名查询
 void searchProfession(Index idx[], int n, char profession[]);// 在含有n个记录的索引文件idx中查找专业为profession的记录对应的记录号
+// 关于学号查询的函数
+void getByNum(void);// 学号查询 
+void getByName(void);// 姓名查询
 void getByProfession(void);// 专业查询
-void inquiry(void);// 查询成绩 
-void showScendMenu(void);// 二级菜单，查询菜单 
-void showScoreScendMenu(void); // 二级菜单，显示成绩的菜单 
-void reviseScore(void);// 修改成绩   
-void showScore(void);// 成绩显示 
-void deleteScore(void);// 删除成绩 
-void saveScore(void);// 保存成绩并退出 
+// 关于成绩显示的函数
 void showScoreByRank(void); // 按排名显示成绩
 void showScoreByName(void);// 按姓名显示成绩
 void showScoreByNum(void);// 按学号显示成绩
 void showScoreByProfession(void);// 按专业显示成绩
+// 用于计算排名
 void calcuteRank(); // 计算排名 
+// 各个功能的函数
+void addStudent(int);// 录入成绩 
+void inquiry(void);// 查询成绩 
+void reviseScore(void);// 修改成绩   
+void showScore(void);// 成绩显示 
+void deleteScore(void);// 删除成绩 
+void saveScore(void);// 保存成绩并退出 
 //main函数 
 int main()
 {
@@ -538,7 +546,7 @@ void showScoreScendMenu(void)
 	printf("*               4： 按学号升序显示                   *\n");
 	printf("*               0： 退出查询系统，返回主系统         *\n");
 	printf("*----------------------------------------------------*\n");
-	printf("选择操作<0-3>                                         \n");
+	printf("选择操作<0-4>                                         \n");
 }
 
 void showScoreByName(void)
