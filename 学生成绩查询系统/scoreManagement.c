@@ -819,11 +819,11 @@ void analyseScore(void)
 		}
 		else if (i == n - 1) {
 			printf("专业\t\t语文平均分\t数学平均分\t英语平均分\n");
-			printf("%8s\t%10.2lf\t%10.2lf\t%10.2lf\n", st[i].profession, scoreOfAllChinese / num, scoreOfAllMath / num, scoreOfAllEnglish / num);
+			printf("%-8s\t%-10.2lf\t%-10.2lf\t%-10.2lf\n", st[i].profession, scoreOfAllChinese / num, scoreOfAllMath / num, scoreOfAllEnglish / num);
 		}
 		else {
 			printf("专业\t\t语文平均分\t数学平均分\t英语平均分\n");
-			printf("%8s\t%10.2lf\t%10.2lf\t%10.2lf\n", cur, scoreOfAllChinese / num, scoreOfAllMath / num, scoreOfAllEnglish / num);
+			printf("%-8s\t%-10.2lf\t%-10.2lf\t%-10.2lf\n", cur, scoreOfAllChinese / num, scoreOfAllMath / num, scoreOfAllEnglish / num);
 			strcpy_s(cur, ProfessionSize, st[i].profession);
 			scoreOfAllChinese = 0.0;
 			scoreOfAllEnglish = 0.0;
