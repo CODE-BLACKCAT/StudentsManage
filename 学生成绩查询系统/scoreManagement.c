@@ -145,12 +145,12 @@ void creatIdxFile()
 	Index idx[MaxSize];
 	Student st;
 	int n = 0, i;
-	if ((mfile = fopen("cj.txt", "r")) == NULL)
+	if ((mfile = fopen("cj.txt", "rb")) == NULL)
 	{
 		printf("  提示:不能打开主文件\n");
 		return;
 	}
-	if ((idxfile = fopen("index.txt", "w")) == NULL)
+	if ((idxfile = fopen("index.txt", "wb")) == NULL)
 	{
 		printf("  提示:不能建立索引文件\n");
 		return;
@@ -177,7 +177,7 @@ void addStudent(int n)
 {
 	Student stu[MaxSize];
 	FILE* mfile;
-	mfile = fopen("cj.txt", "a+");
+	mfile = fopen("cj.txt", "ab+");
 	if (mfile == NULL)
 	{
 		printf("打开文件失败,请重试！\n");
@@ -219,7 +219,7 @@ void readIndexFile(Index idx[MaxSize], int* n)
 {
 	int lengh;
 	FILE* idxfile;
-	if ((idxfile = fopen("index.txt", "r")) == NULL)
+	if ((idxfile = fopen("index.txt", "rb")) == NULL)
 	{
 		printf("  提示:索引文件不能打开\n");
 		return;
@@ -255,7 +255,7 @@ void getByNum()
 	Student st;
 	int i, num;
 	int n;
-	if ((mfile = fopen("cj.txt", "r+")) == NULL)
+	if ((mfile = fopen("cj.txt", "rb+")) == NULL)
 	{
 		printf("  提示:主文件中没有任何记录\n");
 		return;
@@ -301,7 +301,7 @@ void getByName()
 	char name[NameSize];
 	int i = 0, ino = 0;
 	int n;
-	if ((mfile = fopen("cj.txt", "r+")) == NULL)
+	if ((mfile = fopen("cj.txt", "rb+")) == NULL)
 	{
 		printf("  提示:主文件中没有任何记录\n");
 		return;
@@ -314,8 +314,11 @@ void getByName()
 	printf("输入姓名:");
 	scanf_s("%s", name, NameSize);
 	searchName(idx, n, name);      //在idx中查找
-	if (nameArray[0] == -1)
+	if (nameArray[0] == -1) {
 		printf("  提示:姓名%s不存在\n", name);
+		printf("  按任意键继续……\n");
+		int m = _getch();
+	}	
 	else
 	{
 		printf("学号\t姓名\t语文\t数学\t英语\t专业\t\t排名\n");
@@ -351,7 +354,7 @@ void getByProfession()
 	char profession[ProfessionSize];
 	int i = 0, ino = 0;
 	int n;
-	if ((mfile = fopen("cj.txt", "r+")) == NULL)
+	if ((mfile = fopen("cj.txt", "rb+")) == NULL)
 	{
 		printf("  提示:主文件中没有任何记录\n");
 		return;
@@ -366,7 +369,7 @@ void getByProfession()
 	searchProfession(idx, n, profession);      //在idx中查找
 	if (professionArray[0] == -1) {
 		printf("  提示:专业%s不存在\n", profession);
-		printf("  按任意键返回\n");
+		printf("  按任意键返回……\n");
 		int m = _getch();
 	}
 	else
@@ -425,7 +428,7 @@ void reviseScore()
 	Index idx[MaxSize];
 	int i, num;
 	int n;
-	if ((mfile = fopen("cj.txt", "r+")) == NULL)
+	if ((mfile = fopen("cj.txt", "rb+")) == NULL)
 	{
 		printf("  提示:主文件中没有任何记录\n");
 		return;
@@ -494,7 +497,7 @@ void deleteScore()
 	Student stu[MaxSize];
 	int i, num;
 	int n;
-	if ((mfile = fopen("cj.txt", "r+")) == NULL)
+	if ((mfile = fopen("cj.txt", "rb+")) == NULL)
 	{
 		printf("  提示:主文件中没有任何记录\n");
 		return;
@@ -513,7 +516,7 @@ void deleteScore()
 	{
 		fread(stu, sizeof(Student), n, mfile);
 		fclose(mfile);
-		if ((mfile = fopen("cj.txt", "w+")) == NULL)
+		if ((mfile = fopen("cj.txt", "wb+")) == NULL)
 		{
 			printf("  提示:主文件中没有任何记录\n");
 			return;
@@ -562,7 +565,7 @@ void showScoreByName(void)
 	Student stu;
 	Index idx[MaxSize];
 	int n;
-	if ((mfile = fopen("cj.txt", "r+")) == NULL)
+	if ((mfile = fopen("cj.txt", "rb+")) == NULL)
 	{
 		printf("  提示:主文件中没有任何记录\n");
 		return;
@@ -590,7 +593,7 @@ void showScoreByNum(void)
 	Student stu;
 	Index idx[MaxSize];
 	int n;
-	if ((mfile = fopen("cj.txt", "r+")) == NULL)
+	if ((mfile = fopen("cj.txt", "rb+")) == NULL)
 	{
 		printf("  提示:主文件中没有任何记录\n");
 		return;
@@ -669,7 +672,7 @@ void showScoreByRank(void)
 	Student stu;
 	Index idx[MaxSize];
 	int n;
-	if ((mfile = fopen("cj.txt", "r+")) == NULL)
+	if ((mfile = fopen("cj.txt", "rb+")) == NULL)
 	{
 		printf("  提示:主文件中没有任何记录\n");
 		return;
@@ -697,7 +700,7 @@ void showScoreByProfession(void)
 	Student stu;
 	Index idx[MaxSize];
 	int n;
-	if ((mfile = fopen("cj.txt", "r+")) == NULL)
+	if ((mfile = fopen("cj.txt", "rb+")) == NULL)
 	{
 		printf("  提示:主文件中没有任何记录\n");
 		return;
@@ -731,7 +734,7 @@ void calcuteRank()
 	int lengh, n;
 	Student st[MaxSize] = {0};
 	FILE* mfile;
-	if ((mfile = fopen("cj.txt", "r+")) == NULL)
+	if ((mfile = fopen("cj.txt", "rb+")) == NULL)
 	{
 		printf("  提示:索引文件不能打开\n");
 		return;
@@ -788,7 +791,7 @@ void analyseScore(void)
 	Student st[MaxSize];
 	char cur[ProfessionSize];
 	// 打开文件
-	if ((mfile = fopen("cj.txt", "r")) == NULL) {
+	if ((mfile = fopen("cj.txt", "rb")) == NULL) {
 		printf("  提示:不能打开主文件\n");
 		return;
 	}
@@ -853,3 +856,4 @@ void sortByProfessionWithStudent(Student st[MaxSize], int n)
 		st[j + 1] = temp;
 	}
 }
+
