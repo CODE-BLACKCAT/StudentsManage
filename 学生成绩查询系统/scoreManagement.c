@@ -147,12 +147,12 @@ void creatIdxFile()
 	int n = 0, i;
 	if ((mfile = fopen("cj.txt", "rb")) == NULL)
 	{
-		printf("  提示:不能打开主文件\n");
+		printf("提示:不能打开主文件\n");
 		return;
 	}
 	if ((idxfile = fopen("index.txt", "wb")) == NULL)
 	{
-		printf("  提示:不能建立索引文件\n");
+		printf("提示:不能建立索引文件\n");
 		return;
 	}
 	i = 0;
@@ -170,7 +170,7 @@ void creatIdxFile()
 		fwrite(&idx[i], sizeof(Index), 1, idxfile);
 	fclose(mfile);
 	fclose(idxfile);
-	printf("  提示:索引文件建立完毕\n");
+	printf("提示:索引文件建立完毕\n");
 }
 // 学生录入
 void addStudent(int n)
@@ -221,7 +221,7 @@ void readIndexFile(Index idx[MaxSize], int* n)
 	FILE* idxfile;
 	if ((idxfile = fopen("index.txt", "rb")) == NULL)
 	{
-		printf("  提示:索引文件不能打开\n");
+		printf("提示:索引文件不能打开\n");
 		return;
 	}
 	fseek(idxfile, 0, SEEK_END);
@@ -257,7 +257,7 @@ void getByNum()
 	int n;
 	if ((mfile = fopen("cj.txt", "rb+")) == NULL)
 	{
-		printf("  提示:主文件中没有任何记录\n");
+		printf("提示:主文件中没有任何记录\n");
 		return;
 	}
 	readIndexFile(idx, &n);       //读取索引数组idx
@@ -270,7 +270,7 @@ void getByNum()
 	SortByNum(idx, n);
 	i = searchNum(idx, n, num);      //在idx中查找
 	if (i == -1) {
-		printf("  提示:学号%d不存在\n", num);
+		printf("提示:学号%d不存在\n", num);
 		printf("按任意键返回\n");
 		int m = _getch();
 
@@ -307,7 +307,7 @@ void getByName()
 	int n;
 	if ((mfile = fopen("cj.txt", "rb+")) == NULL)
 	{
-		printf("  提示:主文件中没有任何记录\n");
+		printf("提示:主文件中没有任何记录\n");
 		return;
 	}
 	readIndexFile(idx, &n);       //读取索引数组idx
@@ -319,7 +319,7 @@ void getByName()
 	scanf_s("%s", name, NameSize);
 	searchName(idx, n, name);      //在idx中查找
 	if (nameArray[0] == -1) {
-		printf("  提示:姓名%s不存在\n", name);
+		printf("提示:姓名%s不存在\n", name);
 		printf("  按任意键继续……\n");
 		int m = _getch();
 	}	
@@ -360,7 +360,7 @@ void getByProfession()
 	int n;
 	if ((mfile = fopen("cj.txt", "rb+")) == NULL)
 	{
-		printf("  提示:主文件中没有任何记录\n");
+		printf("提示:主文件中没有任何记录\n");
 		return;
 	}
 	readIndexFile(idx, &n);       //读取索引数组idx
@@ -372,8 +372,8 @@ void getByProfession()
 	scanf_s("%s", profession, ProfessionSize);
 	searchProfession(idx, n, profession);      //在idx中查找
 	if (professionArray[0] == -1) {
-		printf("  提示:专业%s不存在\n", profession);
-		printf("  按任意键返回……\n");
+		printf("提示:专业%s不存在\n", profession);
+		printf("按任意键返回……\n");
 		int m = _getch();
 	}
 	else
@@ -434,7 +434,7 @@ void reviseScore()
 	int n;
 	if ((mfile = fopen("cj.txt", "rb+")) == NULL)
 	{
-		printf("  提示:主文件中没有任何记录\n");
+		printf("提示:主文件中没有任何记录\n");
 		return;
 	}
 	readIndexFile(idx, &n);       //读取索引数组idx
@@ -446,7 +446,7 @@ void reviseScore()
 	scanf_s("%d", &num);
 	i = searchNum(idx, n, num);      //在idx中查找
 	if (i == -1) {
-		printf("  提示:学号%d不存在\n", num);
+		printf("提示:学号%d不存在\n", num);
 		printf("按任意键返回\n");
 		int m = _getch();
 	}
@@ -506,7 +506,7 @@ void deleteScore()
 	int n;
 	if ((mfile = fopen("cj.txt", "rb+")) == NULL)
 	{
-		printf("  提示:主文件中没有任何记录\n");
+		printf("提示:主文件中没有任何记录\n");
 		return;
 	}
 	readIndexFile(idx, &n);       //读取索引数组idx
@@ -518,7 +518,7 @@ void deleteScore()
 	scanf_s("%d", &num);
 	i = searchNum(idx, n, num);
 	if (i == -1) {
-		printf("  提示:学号%d不存在\n", num);
+		printf("提示:学号%d不存在\n", num);
 		printf("按任意键返回\n");
 		int m = _getch();
 	}
@@ -528,7 +528,7 @@ void deleteScore()
 		fclose(mfile);
 		if ((mfile = fopen("cj.txt", "wb+")) == NULL)
 		{
-			printf("  提示:主文件中没有任何记录\n");
+			printf("提示:主文件中没有任何记录\n");
 			return;
 		}
 		for (int k = i; k < n; ++k) {
@@ -577,7 +577,7 @@ void showScoreByName(void)
 	int n;
 	if ((mfile = fopen("cj.txt", "rb+")) == NULL)
 	{
-		printf("  提示:主文件中没有任何记录\n");
+		printf("提示:主文件中没有任何记录\n");
 		return;
 	}
 	readIndexFile(idx, &n);       //读取索引数组idx
@@ -605,7 +605,7 @@ void showScoreByNum(void)
 	int n;
 	if ((mfile = fopen("cj.txt", "rb+")) == NULL)
 	{
-		printf("  提示:主文件中没有任何记录\n");
+		printf("提示:主文件中没有任何记录\n");
 		return;
 	}
 	readIndexFile(idx, &n);       //读取索引数组idx
@@ -684,7 +684,7 @@ void showScoreByRank(void)
 	int n;
 	if ((mfile = fopen("cj.txt", "rb+")) == NULL)
 	{
-		printf("  提示:主文件中没有任何记录\n");
+		printf("提示:主文件中没有任何记录\n");
 		return;
 	}
 	readIndexFile(idx, &n);       //读取索引数组idx
@@ -712,7 +712,7 @@ void showScoreByProfession(void)
 	int n;
 	if ((mfile = fopen("cj.txt", "rb+")) == NULL)
 	{
-		printf("  提示:主文件中没有任何记录\n");
+		printf("提示:主文件中没有任何记录\n");
 		return;
 	}
 	readIndexFile(idx, &n);       //读取索引数组idx
@@ -746,7 +746,7 @@ void calcuteRank()
 	FILE* mfile;
 	if ((mfile = fopen("cj.txt", "rb+")) == NULL)
 	{
-		printf("  提示:索引文件不能打开\n");
+		printf("提示:索引文件不能打开\n");
 		return;
 	}
 	fseek(mfile, 0, SEEK_END);
@@ -802,7 +802,7 @@ void analyseScore(void)
 	char cur[ProfessionSize];
 	// 打开文件
 	if ((mfile = fopen("cj.txt", "rb")) == NULL) {
-		printf("  提示:不能打开主文件\n");
+		printf("提示:不能打开主文件\n");
 		return;
 	}
 	// 计算长度
