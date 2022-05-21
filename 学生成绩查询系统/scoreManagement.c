@@ -269,8 +269,12 @@ void getByNum()
 	scanf_s("%d", &num);
 	SortByNum(idx, n);
 	i = searchNum(idx, n, num);      //在idx中查找
-	if (i == -1)
+	if (i == -1) {
 		printf("  提示:学号%d不存在\n", num);
+		printf("按任意键返回\n");
+		int m = _getch();
+
+	}
 	else
 	{
 		fseek(mfile, (idx[i].offset - 1) * sizeof(Student), SEEK_SET); //由记录号直接跳到主文件中对应的记录
@@ -441,8 +445,11 @@ void reviseScore()
 	printf("请输出要修改学生的学号\n");
 	scanf_s("%d", &num);
 	i = searchNum(idx, n, num);      //在idx中查找
-	if (i == -1)
+	if (i == -1) {
 		printf("  提示:学号%d不存在\n", num);
+		printf("按任意键返回\n");
+		int m = _getch();
+	}
 	else
 	{
 		Student stu;
@@ -510,8 +517,11 @@ void deleteScore()
 	printf("请输出要删除学生的学号\n");
 	scanf_s("%d", &num);
 	i = searchNum(idx, n, num);
-	if (i == -1)
+	if (i == -1) {
 		printf("  提示:学号%d不存在\n", num);
+		printf("按任意键返回\n");
+		int m = _getch();
+	}
 	else
 	{
 		fread(stu, sizeof(Student), n, mfile);
