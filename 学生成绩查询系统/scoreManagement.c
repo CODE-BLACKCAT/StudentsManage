@@ -170,7 +170,6 @@ void creatIdxFile()
 		fwrite(&idx[i], sizeof(Index), 1, idxfile);
 	fclose(mfile);
 	fclose(idxfile);
-	printf("提示:索引文件建立完毕\n");
 }
 // 学生录入
 void addStudent(int n)
@@ -578,11 +577,13 @@ void showScoreByName(void)
 	if ((mfile = fopen("cj.txt", "rb+")) == NULL)
 	{
 		printf("提示:主文件中没有任何记录\n");
+		int m = _getch();
 		return;
 	}
 	readIndexFile(idx, &n);       //读取索引数组idx
 	if (n == 0) {
 		printf("无数据\n");
+		int m = _getch();
 		return;
 	}
 	sortByName(idx, n);
@@ -606,11 +607,13 @@ void showScoreByNum(void)
 	if ((mfile = fopen("cj.txt", "rb+")) == NULL)
 	{
 		printf("提示:主文件中没有任何记录\n");
+		int m = _getch();
 		return;
 	}
 	readIndexFile(idx, &n);       //读取索引数组idx
 	if (n == 0) {
 		printf("无数据\n");
+		int m = _getch();
 		return;
 	}
 	SortByNum(idx, n);
@@ -685,11 +688,13 @@ void showScoreByRank(void)
 	if ((mfile = fopen("cj.txt", "rb+")) == NULL)
 	{
 		printf("提示:主文件中没有任何记录\n");
+		int m = _getch();
 		return;
 	}
 	readIndexFile(idx, &n);       //读取索引数组idx
 	if (n == 0) {
 		printf("无数据\n");
+		int m = _getch();
 		return;
 	}
 	sortByRank(idx, n);
@@ -713,11 +718,13 @@ void showScoreByProfession(void)
 	if ((mfile = fopen("cj.txt", "rb+")) == NULL)
 	{
 		printf("提示:主文件中没有任何记录\n");
+		int m = _getch();
 		return;
 	}
 	readIndexFile(idx, &n);       //读取索引数组idx
 	if (n == 0) {
 		printf("无数据\n");
+		int m = _getch();
 		return;
 	}
 	sortByProfession(idx, n);
